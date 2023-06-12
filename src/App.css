@@ -1,11 +1,9 @@
 .animated-box {
   opacity: 0;
   filter: blur(20px);
-  /* transform: translateY(-100%); */
-  transition: all 1.1s ease-in-out;
+  transition: all 0.5s ease-in-out;
 }
 .animate {
   opacity: 1;
   filter: blur(0);
-  /* transform: translateY(0); */
 }

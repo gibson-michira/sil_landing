@@ -155,10 +155,10 @@ const Home = () => {
             {/* <Container> */}
 
 
-            <Box className="animated-box"
+            <Box 
                 p="2px 20vw"
                 position='relative'
-                minHeight="100vh"
+                minHeight="50vh"
                 display="flex"
                 flexDirection="column"
                 justifyContent="center"
@@ -172,9 +172,9 @@ const Home = () => {
                     overflowX: 'hidden'
                 }}
             >
-                <Box 
+                <Box className="animated-box"
                     p={2}
-                    bgcolor="rgba(0, 0, 0, 0.1)"
+                    bgcolor="rgba(0, 0, 0, 0.5)"
                     borderRadius={4}
                     textAlign="cover"
                 >
@@ -201,9 +201,9 @@ const Home = () => {
             {/* </Container> */}
 
 
-            <Box className="animated-box"
+            <Box 
                 p="2px 20vw"
-                minHeight="100vh"
+                minHeight="50vh"
                 display="grid"
                 justifyContent="center"
                 alignItems="center"
@@ -216,9 +216,9 @@ const Home = () => {
                     overflowX: 'hidden'
                 }}
             >
-                <Box 
+                <Box className="animated-box"
                     p={2}
-                    bgcolor="rgba(0, 0, 0, 0.1)"
+                    bgcolor="rgba(0, 0, 0, 0.5)"
                     borderRadius={4}
                     textAlign="center"
                 >
