@@ -6,63 +6,42 @@ import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import Button from '@mui/material/Button';
-import MenuItem from '@mui/material/MenuItem';
 import { Fragment, cloneElement, useEffect, useState } from 'react';
 import { useScrollTrigger } from '@mui/material';
-import Menu from '@mui/material/Menu';
-import MenuIcon from '@mui/icons-material/Menu';
 import { styled } from '@mui/material/styles';
 import ButtonBase from '@mui/material/ButtonBase';
-import Drawer from '@mui/material/Drawer';
-import List from '@mui/material/List';
-import Divider from '@mui/material/Divider';
-import ListItem from '@mui/material/ListItem';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
-import InboxIcon from '@mui/icons-material/MoveToInbox';
-import MailIcon from '@mui/icons-material/Mail';
-import TravelExploreIcon from '@mui/icons-material/TravelExplore';
+import { Formik, Field, ErrorMessage } from 'formik';
+import { Modal } from '@mui/material';
+import TextField from '@mui/material/TextField';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import Select from '@mui/material/Select';
+import FormHelperText from '@mui/material/FormHelperText';
+import Swal from 'sweetalert2';
 
-const pages = ['WIKIS']
-const wikis = [
-    {
-        title: 'Latest App Release',
-        url: 'https://docs.cyberranges.com/doc/cyber-ranges-app-r2023-02-5SDRU3DBdw', //subjec to change
-    },
-    {
-        title: '24/7 Operations',
-        url: 'https://wiki.soctools.silensec.com/doc/247-soc-SizUSeSVe5',
-    },
-    {
-        title: 'CR Use Cases',
-        url: 'https://wiki.soctools.silensec.com/doc/cyber-ranges-use-cases-cdFHFCaNbK',
-    },
-    {
-        title: 'CR Changelog',
-        url: 'https://docs.cyberranges.com/doc/cr-changelog-skw7qoSQmh',
-    },
-]
 
+//Cause I'm lazy
 const images = [
     {
         url: '../../asset/File.svg',
         title: 'CYBER RANGES WIKI',
         width: '50%',
-        height: '400px',
+        height: '350px',
         href: 'https://docs.cyberranges.com/collection/cyber-ranges-wiki-8xv2PHAmAO'
     },
     {
         url: '../../asset/SOC.svg',
         title: 'SOC WIKI',
         width: '50%',
-        height: '400px',
+        height: '350px',
         href: 'https://wiki.soctools.silensec.com/home'
     },
 ]
+//Fancy button design stolen from MUI :)
 const ImageButton = styled(ButtonBase)(({ theme }) => ({
     position: 'relative',
-    height: 200,
+    height: 100,
     [theme.breakpoints.down('sm')]: {
         width: '100% !important', // Overrides inline-style
         height: 100,
@@ -107,7 +86,6 @@ const Image = styled('span')(({ theme }) => ({
     color: theme.palette.common.dark,
 
 }));
-
 const ImageBackdrop = styled('span')(({ theme }) => ({
     position: 'absolute',
     left: 0,
@@ -118,10 +96,9 @@ const ImageBackdrop = styled('span')(({ theme }) => ({
     opacity: 0.4,
     transition: theme.transitions.create('opacity'),
 }));
-
 const ImageMarked = styled('span')(({ theme }) => ({
     height: 3,
-    width: 18,
+    width: 30,
     backgroundColor: theme.palette.common.white,
     position: 'absolute',
     bottom: -2,
@@ -129,6 +106,7 @@ const ImageMarked = styled('span')(({ theme }) => ({
     transition: theme.transitions.create('opacity'),
 }));
 
+//Sticky nav bar
 function ElevatedNav(props) {
     const { children, window } = props; //not needed, remove after test
     const trigger = useScrollTrigger({
@@ -141,22 +119,46 @@ function ElevatedNav(props) {
         elevation: trigger ? 4 : 0,
     });
 }
-
 ElevatedNav.propTypes = {
     children: PropTypes.element.isRequired,//not needed. Including for testing purposes
     window: PropTypes.func
 };
 
-
+//Home logic
 const Home = () => {
-    const [anchorNav, setAnchorNav] = useState(null);
+    //Modal with form 
+    const [isModal, setIsModal] = useState(false)
+    const genDocName = (values) => {
+        let documentName = '';
 
-    const handleOpenNavMenu = (event) => {
-        setAnchorNav(event.currentTarget)
-    };
-    const handleCloseNavMenu = () => {
-        setAnchorNav(null);
+        if (use === 'external') {
+            // const { company, project, documentType, version } = values;
+            const year = new Date().toLocaleDateString('en-US', {
+                year: 'numeric',
+            });
+            const month = new Date().toLocaleDateString('en-US', {
+                month: '2-digit',
+            });
+            const yearSliced = year.slice(-2);
+
+            const documentNumber = Math.floor(Math.random() * 1000) + 1;
+
+            documentName = `${values.company}-${month+yearSliced}-${values.project}${documentNumber}-${values.docType}_v${values.version}`;
+        } else if (values.use === 'internal') {
+            const { client, documentNumber, documentType, version } = values;
+
+            documentName = `CLITT-${documentNumber} v${version}`;
+        }
+        
+        return documentName;
     }
+    const openModal = () => {
+        setIsModal(true);
+    };
+
+    const closeModal = () => {
+        setIsModal(false);
+    };
     //Performing some simple animations.
     useEffect(() => {
         const boxes = document.querySelectorAll('.animated-box');
@@ -172,46 +174,39 @@ const Home = () => {
         const hiddenElements = document.querySelectorAll('.animated-box');
         hiddenElements.forEach((el) => observer.observe(el))
     })
+    const [docType, setDocType] = useState('');
+    const [company, setCompany] = useState('');
+    const [use, setUse] = useState('');
+    const [version, setVersion] = useState('');
+    const [project, setProject] = useState('');
+    const data = {docType, company, use, version, project}
 
-    const [state, setState] = useState({
-        right: false
-    });
-    const toggleDrawer = (anchor, open) => (event) => {
-        if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
-            return;
-        }
-        setState({ ...state, [anchor]: open })
+    const handleChangeVersion = (event) => {
+        setVersion(event.target.value)
     }
-    const list = (anchor) => (
-        <Box sx={{ width: anchor === 'top' || anchor === 'bottom' ? 'auto' : 250 }}
-            role="presentation"
-            onClick={toggleDrawer(anchor, false)}
-            onKeyDown={toggleDrawer(anchor, false)}
-        >
-            <List>
-                {wikis.map((wiki, index) => {
-                    {console.log(wiki.title)}
-                    <ListItem key={wiki.title} disablePadding>
-                        <ListItemButton href={wiki.url}>
-                        {wiki.title}
-                            <ListItemIcon href={wiki.url}>
-                               {wiki.title}
-                            </ListItemIcon>
-                            <ListItemText primary={wiki.title} />
-                        </ListItemButton>
-                    </ListItem>
-                }
-                )}
-            </List>
-        </Box>
-    )
+    const handleChangeProject = (event) => {
+        setProject(event.target.value)
+    }
+    const handleUseChange = (event) => {
+        setUse(event.target.value)
+    }
+
+    const handleChangeDocType = (event) => {
+        setDocType(event.target.value);
+    };
+    const handleChangeCompany = (event) => {
+        setCompany(event.target.value);
+    };
+
 
     return (
         <Fragment>
             <ElevatedNav>
                 <AppBar sx={{ bgcolor: "#08154d" }}>
                     <Container>
-                        <Toolbar disableGutters>
+                        <Toolbar disableGutters sx={{
+                            justifyContent: 'center'
+                        }} >
                             <Typography variant="h6" noWrap component="a" href="/"
                                 sx={{
                                     mr: 2,
@@ -226,95 +221,23 @@ const Home = () => {
                                 <img src="../../asset/B22.png" alt="Logo" height="50px" style={{ cursor: "pointer" }} component="a" href="/"
                                 />
                             </Typography>
-                            <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
-                                <IconButton size="large" aria-label="account of current user" aria-controls="menu-appbar" aria-haspopup="true" onClick={handleOpenNavMenu} color="inherit">
-                                    <MenuIcon />
-                                </IconButton>
-                                <Menu
-                                    id="menu-appbar"
-                                    anchor={anchorNav}
-                                    anchorOrigin={{
-                                        vertical: 'bottom',
-                                        horizontal: 'left',
-                                    }}
-                                    keepMounted
-                                    transformOrigin={{
-                                        vertical: 'top',
-                                        horizontal: 'left',
-                                    }}
-                                    open={Boolean(anchorNav)}
-                                    onClose={handleCloseNavMenu}
-                                    sx={{
-                                        display: { xs: 'block', md: 'none' },
-                                    }}
-                                >
-
-                                    <MenuItem onClick={handleCloseNavMenu}>
-                                        {['right'].map((anchor) => (
-                                            <Fragment key={anchor}>
-                                                <Typography textAlign="center" onClick={toggleDrawer(anchor, true)}>Wikis</Typography>
-                                                <Drawer
-                                                    anchor={anchor}
-                                                    open={state[anchor]}
-                                                    onClose={toggleDrawer(anchor, false)}
-                                                >
-                                                    {list('right')}
-                                                </Drawer>
-                                            </Fragment>
-                                        ))}
-
-                                    </MenuItem>
-
-                                </Menu>
-                            </Box>
-                            <Typography variant="h5" noWrap component="a" href="" sx={{
-                                mr: 2,
-                                display: { xs: 'flex', md: 'none' },
-                                flexGrow: 1,
-                                fontFamily: 'monospace',
-                                fontWeight: 700,
-                                letterSpacing: '.2rem',
-                                color: 'inherit',
-                                textDecoration: 'none',
-                            }}
-                            >
-                                Silensec
-                            </Typography>
-                            <Box sx={{ flexGrow: 2, display: { xs: 'none', md: 'flex' } }}>
-                                {['right'].map((anchor) => (
-                                    <Fragment key={anchor}>
-                                        <Button onClick={toggleDrawer(anchor, true)} sx={{ my: 2, color: 'white', display: 'block' }}>
-                                            Wikis
-                                        </Button>
-                                        <Drawer
-                                            anchor={anchor}
-                                            open={state[anchor]}
-                                            onClose={toggleDrawer(anchor, false)}
-                                        >
-                                            {list(anchor)}
-                                        </Drawer>
-                                    </Fragment>
-                                ))}
-                            </Box>
                         </Toolbar>
                     </Container>
                 </AppBar>
             </ElevatedNav>
             {/* <Container> */}
 
-            <Box id="section1" p="50px" position='relative' display="flex" flexDirection="row" flexWrap="wrap" alignContent="space-between" className="animated-box"
-            // sx={{
-            //     //background: `url('../../asset/sv1.svg')`,
-            //     //aspectRatio: 250 / 250,
-            //     backgroundRepeat: 'no-repeat',
-            //     backgroundPosition: 'center',
-            //     backgroundSize: 'auto',
-            //     overflowX: 'hidden'
-            // }}
+            <Box minHeight="90vh" id="section1" p="50px" position='relative' display="flex" flexDirection="row" flexWrap="wrap" alignContent="space-between" className="animated-box"
+                sx={{
+                    background: `url('../../asset/back1.svg')`,
+                    //aspectRatio: 250 / 250,
+                    backgroundRepeat: 'no-repeat',
+                    backgroundPosition: 'center',
+                    backgroundSize: 'auto',
+                    overflowX: 'hidden'
+                }}
             >
-
-
-                <Box p="100px" sx={{ display: 'flex', flexWrap: 'wrap', minWidth: 300, width: '100%' }} className="animated-box" justifyContent="center">
+                <Box p="25px" sx={{ display: 'flex', flexWrap: 'wrap', minWidth: 300, width: '100%' }} className="animated-box" justifyContent="center">
                     {images.map((image) => (
                         <ImageButton
                             focusRipple
@@ -331,7 +254,7 @@ const Home = () => {
                             <Image>
                                 <Typography
                                     component="span"
-                                    variant="h3"
+                                    variant="h4"
                                     fontWeight="bold"
                                     sx={{
                                         textShadow: '0px 0px 20px rgba(0, 0, 0, 1)',
@@ -349,8 +272,199 @@ const Home = () => {
                         </ImageButton>
                     ))}
                 </Box>
-            </Box>
-        </Fragment>
+
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', minWidth: 300, width: '100%', mt: '-150px' }} className="animated-box" justifyContent="center">
+                    <ImageButton
+                        onClick={openModal}
+                        focusRipple
+                        key="Document Control"
+                        justifyContent="space-between"
+                        style={{
+                            width: '50%',
+                            height: '350px'
+                        }}
+                    >
+                        <ImageSrc style={{ backgroundImage: `url(../../asset/File.svg)` }} />
+                        <ImageBackdrop className="MuiImageBackdrop-root" />
+                        <Image>
+                            <Typography
+                                component="span"
+                                variant="h4"
+                                fontWeight="bold"
+                                sx={{
+                                    textShadow: '0px 0px 20px rgba(0, 0, 0, 1)',
+                                    color: 'white',
+                                    position: 'relative',
+                                    p: 4,
+                                    pt: 2,
+                                    //pb: (theme) => `calc(${theme.spacing(1)} + 6px)`,
+                                }}
+                            >
+                                Generate Document Names
+                                <ImageMarked className="MuiImageMarked-root" />
+                            </Typography>
+                        </Image>
+                    </ImageButton>
+                </Box>
+
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', minWidth: 300, width: '100%' }} className="animated-box" justifyContent="center">
+                    {/* <Button variant="outlined" color="success" onClick={openModal} sx={{ justifyContent: "center", alignItems: "center" }}>
+                        Generate Document Form
+                    </Button> */}
+
+                    <Modal open={isModal} onClose={closeModal} sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+
+                    }}>
+                        <Box sx={{
+                            minWidth: '1000px',
+                            padding: '20px',
+                            borderRadius: '8px',
+                            backgroundColor: '#dbebff',
+                            backgroundRepeat: 'no-repeat',
+                            backgroundSize: 'contain',
+                            overflowX: 'visible',
+                            boxShadow: '0px 0px 20px rgba(0, 0, 0, 1)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                        }}>
+                            <Formik
+                                initialValues={{
+                                    use: '',
+                                    company: '',
+                                    project: '',
+                                    documentType: '',
+                                    version: '',
+                                    client: '',
+                                    documentNumber: '',
+                                }}
+                                validate={(values) => {
+                                    const errors = {};
+
+                                    if (values.use === 'external') {
+                                        if (!values.company) {
+                                            errors.company = 'Required';
+                                        }
+                                        if (!values.project) {
+                                            errors.project = 'Required';
+                                        }
+                                        if (!values.docType) {
+                                            errors.docType = 'Required';
+                                        }
+                                        if (!values.version) {
+                                            errors.version = 'Required';
+                                        }
+                                    } else if (values.use === 'internal') {
+                                        if (!values.client) {
+                                            errors.client = 'Required';
+                                        }
+                                        if (!values.documentNumber) {
+                                            errors.documentNumber = 'Required';
+                                        }
+                                        if (!values.version) {
+                                            errors.version = 'Required';
+                                        }
+                                    }
+
+                                    return errors;
+                                }}
+                                onSubmit={(values, { setSubmitting }) => {
+                                    const documentName = genDocName(data);
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: 'Document Name',
+                                        text: documentName,
+                                });
+                                    //console.log('Generated Document Name:', documentName);
+                                    setSubmitting(false);
+                                    closeModal(); // Close the modal after submitting the form
+                                }}
+                            >
+                                {({ handleSubmit, isSubmitting, values }) => (
+                                    <Box component="form" onSubmit={handleSubmit} >
+                                        <Box>
+                                            <Typography variant="h3">
+                                                Choose Document Reference
+                                            </Typography>
+                                            <FormControl sx={{ m: 1, width: '100%' }}>
+                                                <InputLabel>Choose Document Reference</InputLabel>
+                                                <Select value={use} label="Document Type" name="use" onChange={handleUseChange}>
+                                                    <MenuItem value=""><i>Choose company...</i></MenuItem>
+                                                    <MenuItem value="external">For External Use</MenuItem>
+                                                    <MenuItem value="internal">For Internal Use</MenuItem>
+                                                </Select>
+                                                {console.log(use)}
+
+                                            </FormControl>
+                                        </Box>
+                                        {use === 'external' && (
+                                            <Box>
+                                                <FormControl sx={{ m: 1, width: '100%' }}>
+                                                    <InputLabel>Company</InputLabel>
+                                                    <Select value={company} label="Document Type" onChange={handleChangeCompany} name="company">
+                                                        <MenuItem value=""><i>Choose company...</i></MenuItem>
+                                                        <MenuItem value="SIL">Silensec Africa</MenuItem>
+                                                        <MenuItem value="CRAFR">CYBER RANGES AFRICA</MenuItem>
+                                                    </Select>
+                                                    {console.log(company)}
+                                                </FormControl>
+                                                <FormControl sx={{ m: 1, width: '100%' }}>
+                                                    <InputLabel>Document Type</InputLabel>
+                                                    <Select value={docType} label="Document Type" onChange={handleChangeDocType} name="docType">
+                                                        <MenuItem value=""><i>Choose the document type...</i></MenuItem>
+                                                        <MenuItem value="POW">Proposal of Work</MenuItem>
+                                                        <MenuItem value="LGL">Legal Documents</MenuItem>
+                                                        <MenuItem value="LOA">Letter of Authroization</MenuItem>
+                                                        <MenuItem value="NDA">Non Disclosure Agreement</MenuItem>
+                                                        <MenuItem value="REP">Reports</MenuItem>
+                                                        <MenuItem value="DOC">Generic Document</MenuItem>
+                                                    </Select>
+                                                    {/* {console.log(docType)} */}
+                                                </FormControl>
+                                                <FormControl sx={{ m: 1, width: '100%' }}>
+                                                    <InputLabel>Version</InputLabel>
+                                                    <TextField name="version" variant="outlined" onChange={handleChangeVersion} value={version} />
+                                                    {console.log(version)}
+                                                </FormControl>
+                                                <FormControl sx={{ m: 1, width: '100%' }}>
+                                                    <InputLabel>Project</InputLabel>
+                                                    <TextField name="project" variant="outlined" onChange={handleChangeProject} value={project} />
+                                                    {console.log(project)}
+                                                </FormControl>
+                                            </Box>
+                                        )}
+                                        {use === 'internal' && (
+                                            <>
+                                                <div>
+                                                    <label htmlFor="client">Client:</label>
+                                                    <Field type="text" name="client" />
+                                                    <ErrorMessage name="client" component="div" className="error" />
+                                                </div>
+                                                <div>
+                                                    <label htmlFor="documentNumber">Document Number:</label>
+                                                    <Field type="text" name="documentNumber" />
+                                                    <ErrorMessage name="documentNumber" component="div" className="error" />
+                                                </div>
+                                            </>
+                                        )}
+                                        <Button type="submit" disabled={isSubmitting} variant="contained">
+                                            Submit
+                                        </Button>
+                                    </Box>
+                                )}
+                            </Formik>
+                        </Box>
+                    </Modal>
+                </Box>
+
+
+            </Box >
+
+
+        </Fragment >
     )
 }
 export default Home
