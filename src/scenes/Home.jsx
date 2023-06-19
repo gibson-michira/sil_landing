@@ -2,7 +2,6 @@ import AppBar from '@mui/material/AppBar';
 import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
-import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import Button from '@mui/material/Button';
@@ -10,14 +9,13 @@ import { Fragment, cloneElement, useEffect, useState } from 'react';
 import { useScrollTrigger } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import ButtonBase from '@mui/material/ButtonBase';
-import { Formik, Field, ErrorMessage } from 'formik';
+import { Formik, } from 'formik';
 import { Modal } from '@mui/material';
 import TextField from '@mui/material/TextField';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
-import FormHelperText from '@mui/material/FormHelperText';
 import Swal from 'sweetalert2';
 
 
@@ -143,11 +141,14 @@ const Home = () => {
 
             const documentNumber = Math.floor(Math.random() * 1000) + 1;
 
-            documentName = `${values.company}-${month+yearSliced}-${values.project}${documentNumber}-${values.docType}_v${values.version}`;
-        } else if (values.use === 'internal') {
-            const { client, documentNumber, documentType, version } = values;
+            const acrProject = values.project.split(' ');
+            const acr = acrProject.map(arcs=>arcs[0].toUpperCase()).join('');
 
-            documentName = `CLITT-${documentNumber} v${version}`;
+
+            documentName = `${values.company.toUpperCase()}-${month+yearSliced}-${acr}${documentNumber}-${values.docType.toUpperCase()}_v${values.version}`;
+        } else if (values.use === 'internal') {
+            // documentName = `CLITT-${documentNumber} v${version}`;
+            documentName = `${values.client.toUpperCase()}${values.docType.toUpperCase()}-${values.docNumber}_v${values.version}`;
         }
         
         return documentName;
@@ -179,8 +180,16 @@ const Home = () => {
     const [use, setUse] = useState('');
     const [version, setVersion] = useState('');
     const [project, setProject] = useState('');
-    const data = {docType, company, use, version, project}
+    const [client, setClientName] = useState('');
+    const [docNumber, setDocNumber] = useState('');
+    const data = {docType, company, use, version, project, docNumber, client}
 
+    const handleChangeDocNumber = (event) =>{
+        setDocNumber(event.target.value)
+    }
+    const handleChangeClientName = (event) =>{
+        setClientName(event.target.value)
+    }
     const handleChangeVersion = (event) => {
         setVersion(event.target.value)
     }
@@ -227,7 +236,7 @@ const Home = () => {
             </ElevatedNav>
             {/* <Container> */}
 
-            <Box minHeight="90vh" id="section1" p="50px" position='relative' display="flex" flexDirection="row" flexWrap="wrap" alignContent="space-between" className="animated-box"
+            <Box minWidth="100vh" minHeight="100vh" id="section1" p="50px" position='relative' display="flex" flexDirection="row" flexWrap="wrap" alignContent="space-between" className="animated-box"
                 sx={{
                     background: `url('../../asset/back1.svg')`,
                     //aspectRatio: 250 / 250,
@@ -242,7 +251,7 @@ const Home = () => {
                         <ImageButton
                             focusRipple
                             key={image.title}
-                            justifyContent="space-between"
+                            // justifyContent="space-between"
                             href={image.href}
                             style={{
                                 width: image.width,
@@ -308,9 +317,6 @@ const Home = () => {
                 </Box>
 
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', minWidth: 300, width: '100%' }} className="animated-box" justifyContent="center">
-                    {/* <Button variant="outlined" color="success" onClick={openModal} sx={{ justifyContent: "center", alignItems: "center" }}>
-                        Generate Document Form
-                    </Button> */}
 
                     <Modal open={isModal} onClose={closeModal} sx={{
                         display: 'flex',
@@ -326,7 +332,7 @@ const Home = () => {
                             backgroundRepeat: 'no-repeat',
                             backgroundSize: 'contain',
                             overflowX: 'visible',
-                            boxShadow: '0px 0px 20px rgba(0, 0, 0, 1)',
+                            boxShadow: '0px 0px 50px 30px rgba(0, 0, 0, 1)',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
@@ -373,6 +379,7 @@ const Home = () => {
                                 }}
                                 onSubmit={(values, { setSubmitting }) => {
                                     const documentName = genDocName(data);
+
                                     Swal.fire({
                                         icon: 'success',
                                         title: 'Document Name',
@@ -408,8 +415,7 @@ const Home = () => {
                                                         <MenuItem value=""><i>Choose company...</i></MenuItem>
                                                         <MenuItem value="SIL">Silensec Africa</MenuItem>
                                                         <MenuItem value="CRAFR">CYBER RANGES AFRICA</MenuItem>
-                                                    </Select>
-                                                    {console.log(company)}
+                                                    </Select>    
                                                 </FormControl>
                                                 <FormControl sx={{ m: 1, width: '100%' }}>
                                                     <InputLabel>Document Type</InputLabel>
@@ -422,37 +428,53 @@ const Home = () => {
                                                         <MenuItem value="REP">Reports</MenuItem>
                                                         <MenuItem value="DOC">Generic Document</MenuItem>
                                                     </Select>
-                                                    {/* {console.log(docType)} */}
+                                                    
                                                 </FormControl>
                                                 <FormControl sx={{ m: 1, width: '100%' }}>
-                                                    <InputLabel>Version</InputLabel>
-                                                    <TextField name="version" variant="outlined" onChange={handleChangeVersion} value={version} />
-                                                    {console.log(version)}
+                                                    <TextField name="project" variant="outlined" label="Project" onChange={handleChangeProject} value={project} />
                                                 </FormControl>
                                                 <FormControl sx={{ m: 1, width: '100%' }}>
-                                                    <InputLabel>Project</InputLabel>
-                                                    <TextField name="project" variant="outlined" onChange={handleChangeProject} value={project} />
-                                                    {console.log(project)}
+                                                    <TextField name="version" variant="outlined" label="Version" onChange={handleChangeVersion} value={version} />
                                                 </FormControl>
                                             </Box>
                                         )}
                                         {use === 'internal' && (
-                                            <>
-                                                <div>
-                                                    <label htmlFor="client">Client:</label>
-                                                    <Field type="text" name="client" />
-                                                    <ErrorMessage name="client" component="div" className="error" />
-                                                </div>
-                                                <div>
-                                                    <label htmlFor="documentNumber">Document Number:</label>
-                                                    <Field type="text" name="documentNumber" />
-                                                    <ErrorMessage name="documentNumber" component="div" className="error" />
-                                                </div>
-                                            </>
+                                            <Box>
+                                                <FormControl sx={{ m: 1, width: '100%' }}>
+                                                    <InputLabel>Client Name</InputLabel>
+                                                    <Select value={client} label="Client Name" onChange={handleChangeClientName} name="client">
+                                                        <MenuItem value=""><i>Choose company...</i></MenuItem>
+                                                        <MenuItem value="SIL">Silensec Africa</MenuItem>
+                                                        <MenuItem value="CRAFR">CYBER RANGES AFRICA</MenuItem>
+                                                    </Select>
+                                                </FormControl>
+                                                <FormControl sx={{ m: 1, width: '100%' }}>
+                                                    <InputLabel>Document Type</InputLabel>
+                                                    <Select value={docType} label="Document Type" onChange={handleChangeDocType} name="docType">
+                                                        <MenuItem value=""><i>Choose the document type...</i></MenuItem>
+                                                        <MenuItem value="POL">Policy</MenuItem>
+                                                        <MenuItem value="PRO">Procedure</MenuItem>
+                                                        <MenuItem value="TPL">Template</MenuItem>
+                                                        <MenuItem value="REC">Record</MenuItem>
+                                                    </Select>
+                                                    
+                                                </FormControl>
+                                                <FormControl sx={{ m: 1, width: '100%' }}>
+                                                    <TextField name="docNumber" variant="outlined" label="Document Number" onChange={handleChangeDocNumber}  value={docNumber} />
+                                                </FormControl>
+                                                <FormControl sx={{ m: 1, width: '100%' }}>
+                                                    <TextField name="version" variant="outlined" label="Version" onChange={handleChangeVersion} value={version} />
+                                                </FormControl>
+                                            </Box>
+                                               
                                         )}
-                                        <Button type="submit" disabled={isSubmitting} variant="contained">
+
+                                        {(data.use === 'external') && <Button type="submit" disabled={isSubmitting} variant="contained">
                                             Submit
-                                        </Button>
+                                        </Button>}
+                                        {(data.use === 'internal') && <Button type="submit" disabled={isSubmitting} variant="contained">
+                                            Submit
+                                        </Button>}
                                     </Box>
                                 )}
                             </Formik>
