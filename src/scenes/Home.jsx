@@ -581,7 +581,7 @@ const Home = () => {
                                                                                 </Typography>
                                                                             }
                                                                             placement="right-end"
-                                                                            sx={{ width: '100%' }}
+
                                                                         >
                                                                             <IconButton size="small" style={{ marginRight: '10px' }}>
                                                                                 <AnimatedInfoIcon />
@@ -722,7 +722,7 @@ const Home = () => {
                                                                             TransitionProps={{ timeout: 600 }}
                                                                             title={
                                                                                 <Typography>
-                                                                                    This the company name the document is assocciated with. For example, if you are creating an RFP for CYBER RANGES, Choose CYBER RANGES.
+                                                                                    This the company name the document is associated with. For example, if you are creating an RFP for CYBER RANGES, Choose CYBER RANGES.
                                                                                     <br />
                                                                                     <hr />
                                                                                     Only two options available.
@@ -779,7 +779,7 @@ const Home = () => {
                                                                                 </Typography>
                                                                             }
                                                                             placement="right-end"
-                                                                            sx={{ fontSize: 24, maxWidth: '100%', }}>
+                                                                            >
                                                                             <IconButton size="small" style={{ marginRight: '10px' }}>
                                                                                 <AnimatedInfoIcon />
                                                                             </IconButton>
