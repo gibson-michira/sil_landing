@@ -27,7 +27,7 @@ const images = [
         url: '../../asset/File.svg',
         title: 'CYBER RANGES WIKI',
         width: '100%',
-        height: '500px',
+        height: '400px',
         href: 'https://docs.cyberranges.com/collection/cyber-ranges-wiki-8xv2PHAmAO'
     },
     {
@@ -35,7 +35,7 @@ const images = [
         url: '../../asset/SOC.svg',
         title: 'SOC WIKI',
         width: '100%',
-        height: '500px',
+        height: '400px',
         href: 'https://wiki.soctools.silensec.com/home'
     },
     {
@@ -43,7 +43,7 @@ const images = [
         url: '../../asset/policy.png',
         title: 'POLICIES AND PROCEDURES',
         width: '100%',
-        height: '500px',
+        height: '400px',
         href: 'https://wiki.soctools.silensec.com/home'
     },
     //MUST BE LAST!!!
@@ -52,40 +52,18 @@ const images = [
         title: 'GENERATE DOCUMENTS',
         url: '../../asset/File.svg',
         width: '100%',
-        height: '500px',
+        height: '400px',
 
     }
 ]
-//Fancy button design stolen from MUI :)
-// const ImageButton = styled(ButtonBase)(({ theme }) => ({
-//     position: 'relative',
-//     height: 100,
-//     [theme.breakpoints.down('sm')]: {
-//         width: '100% !important', // Overrides inline-style
-//         height: 200,
-//     },
-//     '&:hover, &.Mui-focusVisible': {
-//         zIndex: 1,
-//         '& .MuiImageBackdrop-root': {
-//             opacity: 0.15,
-//             transition: ' all 0.1s ease-in-out'
-//         },
-//         '& .MuiImageMarked-root': {
-//             opacity: 0,
-//             transition: ' all 0.1s ease-in-out'
-//         },
-//         '& .MuiTypography-root': {
-//             border: '5px solid currentColor',
-//             transition: ' all 0.2s ease-in-out'
-//         },
-//     },
-// }));
+
 const ImageButton = styled(ButtonBase)(({ theme }) => ({
     position: 'relative',
-    height: 100,
+    height: 50,
+    boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.5)',
     [theme.breakpoints.down('sm')]: {
         width: '100% !important', // Overrides inline-style
-        height: 200,
+        height: 100,
     },
     '&:hover, &.Mui-focusVisible': {
         zIndex: 1,
@@ -109,7 +87,6 @@ const ImageSrc = styled('span')({
     right: 0,
     top: 0,
     bottom: 0,
-
     backgroundSize: 'cover',
     backgroundRepeat: 'no-repeat',
     backgroundPosition: 'center 50%',
@@ -134,7 +111,7 @@ const ImageBackdrop = styled('span')(({ theme }) => ({
     top: 0,
     bottom: 0,
     backgroundColor: '#e4ecf7',
-    opacity: 0.4,
+    opacity: 0.8,
     transition: theme.transitions.create('opacity'),
 }));
 const ImageMarked = styled('span')(({ theme }) => ({
@@ -171,7 +148,6 @@ const Home = () => {
     const [isModal, setIsModal] = useState(false)
     const genDocName = (values) => {
         let documentName = '';
-
         if (use === 'external') {
             // const { company, project, documentType, version } = data;
             const year = new Date().toLocaleDateString('en-US', {
@@ -181,27 +157,19 @@ const Home = () => {
                 month: '2-digit',
             });
             const yearSliced = year.slice(-2);
-
-            const documentNumber = Math.floor(Math.random() * 1000) + 1;
-            
+            const documentNumber = Math.floor(Math.random() * 1000) + 1; 
             const acrProject = data.project.split(' ');
-            console.log(acrProject)
             const acr = acrProject.map(word => word.charAt(0).toUpperCase()).join('');
-            console.log(acr)
-
-
             documentName = `${data.company.toUpperCase()}-${month + yearSliced}-${acr}${documentNumber}-${data.docType.toUpperCase()}_v${data.version}`;
         } else if (data.use === 'internal') {
             // documentName = `CLITT-${documentNumber} v${version}`;
             documentName = `${data.client.toUpperCase()}${data.docType.toUpperCase()}-${data.docNumber}_v${data.version}`;
         }
-
         return documentName;
     }
     const openModal = () => {
         setIsModal(true);
     };
-
     const closeModal = () => {
         setIsModal(false);
     };
@@ -227,7 +195,6 @@ const Home = () => {
     const [project, setProject] = useState('');
     const [client, setClientName] = useState('');
     const [docNumber, setDocNumber] = useState('');
-    
     const handleChangeDocNumber = (event) => {
         setDocNumber(event.target.value)
     }
@@ -243,14 +210,12 @@ const Home = () => {
     const handleUseChange = (event) => {
         setUse(event.target.value)
     }
-
     const handleChangeDocType = (event) => {
         setDocType(event.target.value);
     };
     const handleChangeCompany = (event) => {
         setCompany(event.target.value);
     };
-
     const data = { docType, company, use, version, project, docNumber, client }
 
     return (
@@ -292,7 +257,7 @@ const Home = () => {
 
 
                 {/* <Box p="25px" sx={{ display: 'flex', flexWrap: 'wrap', minWidth: 300, width: '100%' }} className="animated-box" justifyContent="center"> */}
-                <Grid container spacing={2} justifyContent="center" p="100px">
+                <Grid container spacing={2} justifyContent="center" p="100px 50px 50px" >
                     {images.map((image) => (
                         <Grid item xs={12} sm={6} md={4} key={image.title}>
                         {image.func===true 
@@ -310,15 +275,16 @@ const Home = () => {
                             <Image>
                                 <Typography
                                     component="span"
-                                    variant="h4"
+                                    variant="h5"
                                     fontWeight="bold"
                                     sx={{
                                         textShadow: '0px 0px 20px rgba(0, 0, 0, 1)',
                                         color: 'white',
                                         position: 'relative',
+                                        backgroundColor: 'rgba(128, 128, 128, 0.5)',
                                         p: 4,
                                         pt: 2,
-                                        //pb: (theme) => `calc(${theme.spacing(1)} + 6px)`,
+                                        pb: (theme) => `calc(${theme.spacing(1)} + 6px)`,
                                     }}
                                 >
                                     {image.title}
@@ -346,15 +312,16 @@ const Home = () => {
                                 <Image>
                                     <Typography
                                         component="span"
-                                        variant="h4"
+                                        variant="h5"
                                         fontWeight="bold"
                                         sx={{
-                                            textShadow: '0px 0px 20px rgba(0, 0, 0, 1)',
+                                            textShadow: '0px 0px 10px rgba(0, 0, 0, 0.5)',
                                             color: 'white',
                                             position: 'relative',
+                                            backgroundColor: 'rgba(128, 128, 128, 0.5)',
                                             p: 4,
                                             pt: 2,
-                                            //pb: (theme) => `calc(${theme.spacing(1)} + 6px)`,
+                                            pb: (theme) => `calc(${theme.spacing(1)} + 6px)`,
                                         }}
                                     >
                                         {image.title}
