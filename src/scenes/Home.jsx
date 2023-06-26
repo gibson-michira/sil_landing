@@ -15,12 +15,21 @@ import TextField from '@mui/material/TextField';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
+import FormHelperText from '@mui/material/FormHelperText';
 import Select from '@mui/material/Select';
 import Swal from 'sweetalert2';
 import Grid from '@mui/material/Grid';
+import { motion } from "framer-motion";
+import { useTheme } from '@mui/material/styles';
+import { useMediaQuery } from '@mui/material';
+import { InputAdornment, IconButton, Popper } from '@mui/material';
+import InfoIcon from '@mui/icons-material/Info';
+import Tooltip, { tooltipClasses } from '@mui/material/Tooltip';
+import Fade from '@mui/material/Fade';
 
 
-//Cause I'm lazy
+
+
 const images = [
     {
         func: false,
@@ -28,7 +37,7 @@ const images = [
         title: 'CYBER RANGES WIKI',
         width: '100%',
         height: '400px',
-        href: 'https://docs.cyberranges.com/collection/cyber-ranges-wiki-8xv2PHAmAO'
+        href: '#'
     },
     {
         func: false,
@@ -36,7 +45,7 @@ const images = [
         title: 'SOC WIKI',
         width: '100%',
         height: '400px',
-        href: 'https://wiki.soctools.silensec.com/home'
+        href: '#'
     },
     {
         func: false,
@@ -44,9 +53,9 @@ const images = [
         title: 'POLICIES AND PROCEDURES',
         width: '100%',
         height: '400px',
-        href: 'https://wiki.soctools.silensec.com/home'
+        href: '#'
     },
-    //MUST BE LAST!!!
+
     {
         func: true,
         title: 'GENERATE DOCUMENTS',
@@ -62,7 +71,7 @@ const ImageButton = styled(ButtonBase)(({ theme }) => ({
     height: 50,
     boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.5)',
     [theme.breakpoints.down('sm')]: {
-        width: '100% !important', // Overrides inline-style
+        width: '100% !important',
         height: 100,
     },
     '&:hover, &.Mui-focusVisible': {
@@ -124,9 +133,9 @@ const ImageMarked = styled('span')(({ theme }) => ({
     transition: theme.transitions.create('opacity'),
 }));
 
-//Sticky nav bar
+
 function ElevatedNav(props) {
-    const { children, window } = props; //not needed, remove after test
+    const { children, window } = props;
     const trigger = useScrollTrigger({
         disableHysteresis: true,
         threshold: 0,
@@ -138,18 +147,18 @@ function ElevatedNav(props) {
     });
 }
 ElevatedNav.propTypes = {
-    children: PropTypes.element.isRequired,//not needed. Including for testing purposes
+    children: PropTypes.element.isRequired,
     window: PropTypes.func
 };
 
-//Home logic
+
 const Home = () => {
-    //Modal with form 
+
     const [isModal, setIsModal] = useState(false)
     const genDocName = (values) => {
         let documentName = '';
         if (use === 'external') {
-            // const { company, project, documentType, version } = data;
+
             const year = new Date().toLocaleDateString('en-US', {
                 year: 'numeric',
             });
@@ -157,12 +166,19 @@ const Home = () => {
                 month: '2-digit',
             });
             const yearSliced = year.slice(-2);
-            const documentNumber = Math.floor(Math.random() * 1000) + 1; 
+            const documentNumber = Math.floor(Math.random() * 1000) + 1;
             const acrProject = data.project.split(' ');
-            const acr = acrProject.map(word => word.charAt(0).toUpperCase()).join('');
+            let acr;
+            if (acrProject.length === 1 && acrProject[0].length <= 2) {
+
+                acr = acrProject[0].toUpperCase();
+            } else {
+
+                acr = acrProject.map(word => word.charAt(0).toUpperCase()).join('');
+            }
             documentName = `${data.company.toUpperCase()}-${month + yearSliced}-${acr}${documentNumber}-${data.docType.toUpperCase()}_v${data.version}`;
         } else if (data.use === 'internal') {
-            // documentName = `CLITT-${documentNumber} v${version}`;
+
             documentName = `${data.client.toUpperCase()}${data.docType.toUpperCase()}-${data.docNumber}_v${data.version}`;
         }
         return documentName;
@@ -173,7 +189,15 @@ const Home = () => {
     const closeModal = () => {
         setIsModal(false);
     };
-    //Performing some simple animations.
+    const CustomWidthTooltip = styled(({ className, ...props }) => (
+        <Tooltip {...props} classes={{ popper: className }} />
+    ))({
+        [`& .${tooltipClasses.tooltip}`]: {
+            maxWidth: 600,
+            textAlign: 'justify',
+            fontSize: '24px'
+        },
+    });
     useEffect(() => {
         const boxes = document.querySelectorAll('.animated-box');
         const observer = new IntersectionObserver((entries) => {
@@ -217,9 +241,70 @@ const Home = () => {
         setCompany(event.target.value);
     };
     const data = { docType, company, use, version, project, docNumber, client }
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+    const AnimatedInfoIcon = styled(InfoIcon)`
+        animation: heartbeat 1.5s infinite;
 
+        @keyframes heartbeat {
+            0% {
+            transform: scale(1);
+            }
+            50% {
+            transform: scale(1.2);
+            }
+            100% {
+            transform: scale(1);
+            }
+        }
+        `;
     return (
         <Fragment>
+            <ElevatedNav>
+                <AppBar sx={{ bgcolor: '#08154d' }}>
+                    <Container>
+                        <Toolbar disableGutters sx={{ justifyContent: 'center' }}>
+                            <Typography
+                                variant="h6"
+                                noWrap
+                                component="a"
+                                href="/"
+                                sx={{
+                                    mr: 2,
+                                    display: { xs: 'none', md: 'flex' },
+                                    fontWeight: 800,
+                                    letterSpacing: '.2rem',
+                                    color: 'inherit',
+                                    textDecoration: 'none',
+                                }}
+                            >
+                                {!isMobile && (
+                                    <Fragment>
+                                        <img
+                                            src="../../asset/B22.png"
+                                            alt="Logo"
+                                            height="50px"
+                                            style={{ cursor: 'pointer' }}
+                                            component="a"
+                                            href="/"
+                                        />
+                                    </Fragment>
+                                )}
+                            </Typography>
+                            {isMobile && (
+                                <img
+                                    src="../../asset/B22.png"
+                                    alt="Logo"
+                                    height="50px"
+                                    style={{ cursor: 'pointer' }}
+                                    component="a"
+                                    href="/"
+                                />
+                            )}
+                        </Toolbar>
+                    </Container>
+                </AppBar>
+            </ElevatedNav>
             <Box
                 position="relative"
                 display="flex"
@@ -228,133 +313,105 @@ const Home = () => {
                 alignContent="space-between"
                 className="animated-box"
             >
-                <ElevatedNav>
-                    <AppBar sx={{ bgcolor: "#08154d" }}>
-                        <Container>
-                            <Toolbar disableGutters sx={{
-                                justifyContent: 'center'
-                            }} >
-                                <Typography variant="h6" noWrap component="a" href="/"
-                                    sx={{
-                                        mr: 2,
-                                        display: { xs: 'none', md: 'flex' },
-                                        fontWeight: 800,
-                                        letterSpacing: '.2rem',
-                                        color: 'inherit',
-                                        textDecoration: 'none'
-
-                                    }}
-                                >
-                                    <img src="../../asset/B22.png" alt="Logo" height="50px" style={{ cursor: "pointer" }} component="a" href="/"
-                                    />
-                                </Typography>
-                            </Toolbar>
-                        </Container>
-                    </AppBar>
-                </ElevatedNav>
-                {/* <Container> */}
-
-
-
-                {/* <Box p="25px" sx={{ display: 'flex', flexWrap: 'wrap', minWidth: 300, width: '100%' }} className="animated-box" justifyContent="center"> */}
-                <Grid container spacing={2} justifyContent="center" p="100px 50px 50px" >
+                <Grid container spacing={6} justifyContent="center" p="100px 50px 50px" >
                     {images.map((image) => (
                         <Grid item xs={12} sm={6} md={4} key={image.title}>
-                        {image.func===true 
-                            ? (
-                                <ImageButton
-                            onClick={() => openModal()}
-                            focusRipple
-                            style={{
-                                width: image.width,
-                                height: image.height
-                            }}
-                        >
-                            <ImageSrc style={{ backgroundImage: `url(${image.url})`}}/> {/* Added backgroundSize: 'cover' to ensure the image covers the entire container */}
-                            <ImageBackdrop className="MuiImageBackdrop-root" />
-                            <Image>
-                                <Typography
-                                    component="span"
-                                    variant="h5"
-                                    fontWeight="bold"
-                                    sx={{
-                                        textShadow: '0px 0px 20px rgba(0, 0, 0, 1)',
-                                        color: 'white',
-                                        position: 'relative',
-                                        backgroundColor: 'rgba(128, 128, 128, 0.5)',
-                                        p: 4,
-                                        pt: 2,
-                                        pb: (theme) => `calc(${theme.spacing(1)} + 6px)`,
-                                    }}
-                                >
-                                    {image.title}
-                                    <ImageMarked className="MuiImageMarked-root" />
-                                </Typography>
-                            </Image>
-                        </ImageButton>
-                            )
-                            
-                            
-                            : (
-                                <ImageButton
-                                focusRipple
-                                key={image.title}
-                                // justifyContent="space-between"
-                                href={image.href}
-                                target="_blank"
-                                style={{
-                                    width: image.width,
-                                    height: image.height
-                                }}
-                            >
-                                <ImageSrc style={{ backgroundImage: `url(${image.url})` }} />
-                                <ImageBackdrop className="MuiImageBackdrop-root" />
-                                <Image>
-                                    <Typography
-                                        component="span"
-                                        variant="h5"
-                                        fontWeight="bold"
-                                        sx={{
-                                            textShadow: '0px 0px 10px rgba(0, 0, 0, 0.5)',
-                                            color: 'white',
-                                            position: 'relative',
-                                            backgroundColor: 'rgba(128, 128, 128, 0.5)',
-                                            p: 4,
-                                            pt: 2,
-                                            pb: (theme) => `calc(${theme.spacing(1)} + 6px)`,
+                            {image.func === true
+                                ? (
+                                    <ImageButton
+                                        onClick={() => openModal()}
+                                        focusRipple
+                                        style={{
+                                            width: image.width,
+                                            height: image.height
                                         }}
+                                        component={motion.div}
+                                        whileHover={{
+                                            scale: 1.1,
+                                            transition: { duration: 0.3 }
+                                        }}
+                                        whileTap={{ scale: 0.9 }}
                                     >
-                                        {image.title}
-                                        <ImageMarked className="MuiImageMarked-root" />
-                                    </Typography>
-                                </Image>
-                            </ImageButton>
-                            )
-                            
-                            
-                            
-                        
-                    }
+                                        <ImageSrc style={{ backgroundImage: `url(${image.url})` }} />
+                                        <ImageBackdrop className="MuiImageBackdrop-root" />
+                                        <Image>
+                                            <Typography
+                                                component="span"
+                                                variant="h6"
+                                                fontWeight="bold"
+                                                sx={{
+                                                    textShadow: '0px 0px 20px rgba(0, 0, 0, 1)',
+                                                    color: 'white',
+                                                    position: 'relative',
+                                                    backgroundColor: 'rgba(128, 128, 128, 0.5)',
+                                                    p: 4,
+                                                    pt: 2,
+                                                    pb: (theme) => `calc(${theme.spacing(1)} + 6px)`,
+                                                }}
+                                            >
+                                                {image.title}
+                                                <ImageMarked className="MuiImageMarked-root" />
+                                            </Typography>
+                                        </Image>
+                                    </ImageButton>
+                                )
+
+
+                                : (
+                                    <ImageButton
+                                        focusRipple
+                                        key={image.title}
+
+                                        href={image.href}
+                                        target="_blank"
+                                        style={{
+                                            width: image.width,
+                                            height: image.height
+                                        }}
+                                        component={motion.a}
+                                        whileHover={{
+                                            scale: 1.1,
+                                            transition: { duration: 0.3 }
+                                        }}
+                                        whileTap={{ scale: 0.9 }}
+                                    >
+                                        <ImageSrc style={{ backgroundImage: `url(${image.url})` }} />
+                                        <ImageBackdrop className="MuiImageBackdrop-root" />
+                                        <Image>
+                                            <Typography
+                                                component="span"
+                                                variant="h6"
+                                                fontWeight="bold"
+                                                sx={{
+                                                    textShadow: '0px 0px 10px rgba(0, 0, 0, 0.5)',
+                                                    color: 'white',
+                                                    position: 'relative',
+                                                    backgroundColor: 'rgba(128, 128, 128, 0.5)',
+                                                    p: 4,
+                                                    pt: 2,
+                                                    pb: (theme) => `calc(${theme.spacing(1)} + 6px)`,
+                                                }}
+                                            >
+                                                {image.title}
+                                                <ImageMarked className="MuiImageMarked-root" />
+                                            </Typography>
+                                        </Image>
+                                    </ImageButton>
+                                )
+
+
+
+
+                            }
                         </Grid>
                     ))}
-                    {/* <Grid item xs={12} sm={6} md={4}>
-                        
-                    </Grid> */}
 
                 </Grid>
-                {/* </Box> */}
-
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', minWidth: 300, width: '100%' }} className="animated-box" justifyContent="center">
-
-                </Box>
-
-                <Box sx={{ display: 'flex', flexWrap: 'wrap', minWidth: 300, width: '100%' }} className="animated-box" justifyContent="center">
-
                     <Modal open={isModal} onClose={closeModal} sx={{
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-
                     }}>
                         <Box sx={{
                             minWidth: '1000px',
@@ -368,157 +425,510 @@ const Home = () => {
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
+
                         }}>
                             <Formik
-  initialValues={{
-    use: "",
-    company: "",
-    project: "",
-    docType: "",
-    version: "",
-    client: "",
-    docNumber: ""
-  }}
-  validate={(values) => {
-    const errors = {};
+                                initialValues={{
+                                    use: "",
+                                    company: "",
+                                    project: "",
+                                    docType: "",
+                                    version: "",
+                                    client: "",
+                                    docNumber: ""
+                                }}
+                                validate={(values) => {
+                                    const errors = {};
 
-    if (use === "external") {
-      if (!company) {
-        errors.company = "Required";
-      }
-      if (!project) {
-        errors.project = "Required";
-      }
-      if (!docType) {
-        errors.docType = "Required";
-      }
-      if (!version) {
-        errors.version = "Required";
-      }
-    } else if (use === "internal") {
-      if (!client) {
-        errors.client = "Required";
-      }
-      if (!docNumber) {
-        errors.docNumber = "Required";
-      }
-      if (!version) {
-        errors.version = "Required";
-      }
-    }
-
-    return errors;
-  }}
-  onSubmit={(values, { setSubmitting }) => {
-    const documentName = genDocName(values);
-    console.log(values)
-    Swal.fire({
-      icon: "success",
-      title: "Document Name",
-      text: documentName
-    });
-    setSubmitting(false);
-    closeModal(); // Close the modal after submitting the form
-  }}
->
-  {({ handleSubmit, isSubmitting, values, errors, touched }) => (
-    <Box component="form" onSubmit={handleSubmit}>
-      <Box>
-                                            <Typography variant="h3">
-                                                Choose Document Reference
-                                            </Typography>
-                                            <FormControl sx={{ m: 1, width: '100%' }}>
+                                    if (use === "external") {
+                                        if (!company) {
+                                            errors.company = "Required";
+                                        }
+                                        if (!project) {
+                                            errors.project = "Required";
+                                        }
+                                        if (!docType) {
+                                            errors.docType = "Required";
+                                        }
+                                        if (!version) {
+                                            errors.version = "Required";
+                                        } else if (!/^(\d+\.\d+)$/.test(version)) {
+                                            errors.version = "Invalid version format. Version should be num.num, e.g., 1.2, 0.5, 4.6, etc...";
+                                        }
+                                    } else if (use === "internal") {
+                                        if (!client) {
+                                            errors.client = "Required";
+                                        }
+                                        if (!docType) {
+                                            errors.docType = "Required";
+                                        }
+                                        if (!docNumber) {
+                                            errors.docNumber = 'Required';
+                                        } else if (!/^\d+$/.test(docNumber)) {
+                                            errors.docNumber = 'Invalid document number format. Only integers are allowed, e.g., 123';
+                                        }
+                                        if (!version) {
+                                            errors.version = "Required";
+                                        } else if (!/^(\d+\.\d+)$/.test(version)) {
+                                            errors.version = "Invalid version format. Version should be num.num, e.g., 1.2, 0.5, 4.6, etc...";
+                                        }
+                                    }
+                                    console.log(errors)
+                                    return errors;
+                                }}
+                                onSubmit={(values, { setSubmitting }) => {
+                                    const documentName = genDocName(values);
+                                    console.log(values)
+                                    Swal.fire({
+                                        icon: "success",
+                                        title: "Document Name",
+                                        text: documentName
+                                    });
+                                    setSubmitting(false);
+                                    closeModal();
+                                }}
+                            >
+                                {({ handleSubmit, isSubmitting, values, errors, touched }) => (
+                                    <Box component="form" onSubmit={handleSubmit}>
+                                        <Box>
+                                            <Typography variant="h3">Choose Document Reference</Typography>
+                                            <FormControl sx={{ width: '100%', mb: 1, mt: 1 }}>
                                                 <InputLabel>Choose Document Reference</InputLabel>
                                                 <Select value={use} label="Document Type" name="use" onChange={handleUseChange}>
-                                                    <MenuItem ><i>Choose company...</i></MenuItem>
+                                                    <MenuItem value=""><i>Choose document reference...</i></MenuItem>
                                                     <MenuItem value="external">For External Use</MenuItem>
                                                     <MenuItem value="internal">For Internal Use</MenuItem>
                                                 </Select>
-                                                {/* {console.log(use)} */}
                                             </FormControl>
                                         </Box>
                                         {use === 'external' && (
                                             <Box>
-                                                <FormControl sx={{ m: 1, width: '100%' }}>
-                                                    <InputLabel>Company</InputLabel>
-                                                    <Select value={company} label="Document Type" onChange={handleChangeCompany} name="company" error={Boolean(touched.company && errors.company)}>
-                                                        <MenuItem ><i>Choose company...</i></MenuItem>
-                                                        <MenuItem value="SIL">Silensec Africa</MenuItem>
-                                                        <MenuItem value="CRAFR">CYBER RANGES AFRICA</MenuItem>
-                                                    </Select>
-                                                    {/* {console.log(company)} */}
-                                                </FormControl>
-                                                <FormControl sx={{ m: 1, width: '100%' }}>
-                                                    <InputLabel>Document Type</InputLabel>
-                                                    <Select value={docType} label="Document Type" onChange={handleChangeDocType} name="docType" error={Boolean(touched.docType && errors.docType)}>
-                                                        <MenuItem ><i>Choose the document type...</i></MenuItem>
-                                                        <MenuItem value="POW">Proposal of Work</MenuItem>
-                                                        <MenuItem value="LGL">Legal Documents</MenuItem>
-                                                        <MenuItem value="LOA">Letter of Authroization</MenuItem>
-                                                        <MenuItem value="NDA">Non Disclosure Agreement</MenuItem>
-                                                        <MenuItem value="REP">Reports</MenuItem>
-                                                        <MenuItem value="DOC">Generic Document</MenuItem>
-                                                    </Select>
-                                                    {/* {console.log(docType)} */}
-                                                </FormControl>
-                                                <FormControl sx={{ m: 1, width: '100%' }}>
-                                                    <TextField name="project" variant="outlined" label="Project" onChange={handleChangeProject} value={project} error={Boolean(touched.project && errors.project)} />
-                                                    {/* {console.log(project)} */}
-                                                </FormControl>
-                                                <FormControl sx={{ m: 1, width: '100%' }}>
-                                                    <TextField name="version" variant="outlined" label="Version" onChange={handleChangeVersion} value={version} error={Boolean(touched.version && errors.version)} />
-                                                    {/* {console.log(version)} */}
-                                                </FormControl>
+                                                <Grid container spacing={2}>
+                                                    <Grid item xs={12} sm={6}>
+                                                        <FormControl fullWidth>
+                                                            <InputLabel>Company</InputLabel>
+                                                            <Select
+                                                                value={company}
+                                                                label="Company"
+                                                                onChange={handleChangeCompany}
+                                                                name="company"
+                                                                error={Boolean(touched.company && errors.company)}
+                                                                endAdornment={
+                                                                    <InputAdornment position="end">
+                                                                        <CustomWidthTooltip
+                                                                            TransitionComponent={Fade}
+                                                                            TransitionProps={{ timeout: 600 }}
+                                                                            title={
+                                                                                <Typography>
+                                                                                    This the company name the document is assocciated with. For example, if you are creating an RFP for CYBER RANGES, Choose CYBER RANGES.
+                                                                                    <br />
+                                                                                    <hr />
+                                                                                    Only two options available.
+                                                                                    <ul>
+                                                                                        <li>CYBER RANGES</li>
+                                                                                        <li>Silensec</li>
+                                                                                    </ul>
+                                                                                </Typography>
+                                                                            }
+                                                                            placement="right-end"
+                                                                        >
+                                                                            <IconButton size="small" style={{ marginRight: '10px' }}>
+                                                                                <AnimatedInfoIcon />
+                                                                            </IconButton>
+                                                                        </CustomWidthTooltip>
+                                                                    </InputAdornment>
+                                                                }
+                                                            >
+                                                                <MenuItem value=""><i>Choose company...</i></MenuItem>
+                                                                <MenuItem value="SIL">Silensec</MenuItem>
+                                                                <MenuItem value="CR">CYBER RANGES</MenuItem>
+                                                            </Select>
+
+                                                            {touched.company && errors.company && (
+                                                                <FormHelperText error>
+                                                                    {errors.company}
+                                                                </FormHelperText>
+                                                            )}
+                                                        </FormControl>
+                                                    </Grid>
+
+                                                    <Grid item xs={12} sm={6} sx={{ position: 'relative' }}>
+                                                        <FormControl fullWidth>
+                                                            <InputLabel>Document Type</InputLabel>
+                                                            <Select
+                                                                value={docType}
+                                                                label="Document Type"
+                                                                onChange={handleChangeDocType}
+                                                                name="docType"
+                                                                error={Boolean(touched.docType && errors.docType)}
+                                                                endAdornment={
+                                                                    <InputAdornment position="end">
+                                                                        <CustomWidthTooltip
+                                                                            TransitionComponent={Fade}
+                                                                            TransitionProps={{ timeout: 600 }}
+                                                                            title={
+                                                                                <Typography>
+                                                                                    This the document type, which can be any of the following:
+                                                                                    <br />
+                                                                                    <ul>
+                                                                                        <li><b>Proposal of Work</b>: <i>These are documents issued to Silensec Company containing Silensec's proposal of work to meet specific company requirements. (May include, in some cases, the related financial details)</i></li>
+                                                                                        <li><b>Legal Documents</b>: <i>These represent any document legally binding between Silensec/CYBER RANGES and a company for the provision of professional services or sales of products. (E.g., Contracts, General Terms and Agreements)</i></li>
+                                                                                        <li><b>Letter of Authorization</b>: <i>This is a form that is filled in and signed by a company for whom Silensec is performing a security audit, which involves ethical hacking activities (i.e., activities that are forbidden by law and for which the company has to provide explicit consent).</i></li>
+                                                                                        <li><b>Non-Disclosure Agreement</b>: <i>It is a legally binding contract between two or more parties that outlines confidential information they wish to share with each other while restricting its disclosure to third parties.</i></li>
+                                                                                        <li><b>Reports</b>: <i>These are reports generated by Silensec as part of the work carried out for a company (e.g., Audit Reports)</i></li>
+                                                                                        <li><b>Document</b>: <i>This refers to a generic document that does not fall into any of the above categories.</i></li>
+                                                                                    </ul>
+                                                                                </Typography>
+                                                                            }
+                                                                            placement="right-end"
+                                                                            sx={{ width: '100%' }}
+                                                                        >
+                                                                            <IconButton size="small" style={{ marginRight: '10px' }}>
+                                                                                <AnimatedInfoIcon />
+                                                                            </IconButton>
+                                                                        </CustomWidthTooltip>
+                                                                    </InputAdornment>
+                                                                }
+                                                            >
+                                                                <MenuItem value=""><i>Choose the document type...</i></MenuItem>
+                                                                <MenuItem value="POW">Proposal of Work</MenuItem>
+                                                                <MenuItem value="LGL">Legal Documents</MenuItem>
+                                                                <MenuItem value="LOA">Letter of Authorization</MenuItem>
+                                                                <MenuItem value="NDA">Non-Disclosure Agreement</MenuItem>
+                                                                <MenuItem value="REP">Reports</MenuItem>
+                                                                <MenuItem value="DOC">Generic Document</MenuItem>
+                                                            </Select>
+                                                            {touched.docType && errors.docType && (
+                                                                <FormHelperText error>
+                                                                    {errors.docType}
+                                                                </FormHelperText>
+                                                            )}
+                                                        </FormControl>
+                                                    </Grid>
+                                                    <Grid item xs={12} sm={6}>
+                                                        <FormControl fullWidth>
+                                                            <TextField
+                                                                name="project"
+                                                                variant="outlined"
+                                                                label="Project"
+                                                                onChange={handleChangeProject}
+                                                                value={project}
+                                                                error={Boolean(touched.project && errors.project)}
+                                                                InputProps={{
+                                                                    endAdornment: (
+                                                                        <InputAdornment position="end">
+                                                                            <CustomWidthTooltip
+                                                                                TransitionComponent={Fade}
+                                                                                TransitionProps={{ timeout: 600 }}
+                                                                                title={
+                                                                                    <Typography>
+                                                                                        This the <b>full name</b> of the project. For example:
+                                                                                        <ul>
+                                                                                            <li>NCBA Cyberdrill</li>
+                                                                                            <li>UBF Cyberdrill</li>
+                                                                                            <li>Etc...</li>
+                                                                                        </ul>
+
+
+                                                                                        <hr />
+                                                                                        The system will auto-abbreviatte the above name, however you can also provide the abbreviatted name.
+                                                                                        <br />
+                                                                                        <br />
+                                                                                        For example, <b>NCBA Cyberdrill</b>, will be abbreviatted to <b><i>NC</i></b>
+                                                                                    </Typography>
+                                                                                }
+                                                                                placement="right-end"
+                                                                                sx={{ fontSize: 24 }}>
+                                                                                <IconButton size="small">
+                                                                                    <AnimatedInfoIcon />
+                                                                                </IconButton>
+                                                                            </CustomWidthTooltip>
+                                                                        </InputAdornment>
+                                                                    ),
+                                                                }}
+                                                            />
+                                                            {touched.project && errors.project && (
+                                                                <FormHelperText error>
+                                                                    {errors.project}
+                                                                </FormHelperText>
+                                                            )}
+                                                        </FormControl>
+                                                    </Grid>
+                                                    <Grid item xs={12} sm={6}>
+                                                        <FormControl fullWidth>
+                                                            <TextField
+                                                                name="version"
+                                                                variant="outlined"
+                                                                label="Version"
+                                                                onChange={handleChangeVersion}
+                                                                value={version}
+                                                                error={Boolean(touched.version && errors.version)}
+                                                                InputProps={{
+                                                                    endAdornment: (
+                                                                        <InputAdornment position="end">
+                                                                            <CustomWidthTooltip
+                                                                                TransitionComponent={Fade}
+                                                                                TransitionProps={{ timeout: 600 }}
+                                                                                title={
+                                                                                    <Typography>
+                                                                                        This the <b>version number</b> of the document.
+                                                                                        <br />
+                                                                                        <br />
+                                                                                        For example:
+                                                                                        <ul>
+                                                                                            <li>0.1</li>
+                                                                                            <li>0.2</li>
+                                                                                            <li>Etc...</li>
+                                                                                        </ul>
+
+                                                                                    </Typography>
+                                                                                }
+                                                                                placement="right-end"
+                                                                            >
+                                                                                <IconButton size="small">
+                                                                                    <AnimatedInfoIcon />
+                                                                                </IconButton>
+                                                                            </CustomWidthTooltip>
+                                                                        </InputAdornment>
+                                                                    ),
+                                                                }}
+                                                            />
+                                                            {touched.version && errors.version && (
+                                                                <FormHelperText error>
+                                                                    {errors.version}
+                                                                </FormHelperText>
+                                                            )}
+                                                        </FormControl>
+                                                    </Grid>
+                                                </Grid>
                                             </Box>
                                         )}
                                         {use === 'internal' && (
                                             <Box>
-                                                <FormControl sx={{ m: 1, width: '100%' }}>
-                                                    <InputLabel>Client Name</InputLabel>
-                                                    <Select value={client} label="Client Name" onChange={handleChangeClientName} name="client" error={Boolean(touched.client && errors.client)}>
-                                                        <MenuItem ><i>Choose company...</i></MenuItem>
-                                                        <MenuItem value="SIL">Silensec Africa</MenuItem>
-                                                        <MenuItem value="CRAFR">CYBER RANGES AFRICA</MenuItem>
-                                                    </Select>
-                                                </FormControl>
-                                                <FormControl sx={{ m: 1, width: '100%' }}>
-                                                    <InputLabel>Document Type</InputLabel>
-                                                    <Select value={docType} label="Document Type" onChange={handleChangeDocType} name="docType" error={Boolean(touched.docType && errors.docType)}>
-                                                        <MenuItem ><i>Choose the document type...</i></MenuItem >
-                                                        <MenuItem value="POL">Policy</MenuItem>
-                                                        <MenuItem value="PRO">Procedure</MenuItem>
-                                                        <MenuItem value="TPL">Template</MenuItem>
-                                                        <MenuItem value="REC">Record</MenuItem>
-                                                    </Select>
+                                                <Grid container spacing={2}>
+                                                    <Grid item xs={12} sm={6}>
+                                                        <FormControl sx={{ width: '100%', mb: 1, mt: 1 }}>
+                                                            <InputLabel>Client Name</InputLabel>
+                                                            <Select
+                                                                value={client}
+                                                                label="Client Name"
+                                                                onChange={handleChangeClientName}
+                                                                name="client"
+                                                                error={Boolean(touched.client && errors.client)}
+                                                                endAdornment={
+                                                                    <InputAdornment position="end">
+                                                                        <CustomWidthTooltip
+                                                                            TransitionComponent={Fade}
+                                                                            TransitionProps={{ timeout: 600 }}
+                                                                            title={
+                                                                                <Typography>
+                                                                                    This the company name the document is assocciated with. For example, if you are creating an RFP for CYBER RANGES, Choose CYBER RANGES.
+                                                                                    <br />
+                                                                                    <hr />
+                                                                                    Only two options available.
+                                                                                    <ul>
+                                                                                        <li>CYBER RANGES</li>
+                                                                                        <li>Silensec</li>
+                                                                                    </ul>
+                                                                                </Typography>
+                                                                            }
+                                                                            placement="right-end"
+                                                                        >
+                                                                            <IconButton size="small" style={{ marginRight: '10px' }}>
+                                                                                <AnimatedInfoIcon />
+                                                                            </IconButton>
+                                                                        </CustomWidthTooltip>
+                                                                    </InputAdornment>
+                                                                }
+                                                            >
+                                                                <MenuItem value=""><i>Choose company...</i></MenuItem>
+                                                                <MenuItem value="SIL">Silensec</MenuItem>
+                                                                <MenuItem value="CR">CYBER RANGES</MenuItem>
+                                                            </Select>
+                                                            {touched.client && errors.client && (
+                                                                <FormHelperText error>
+                                                                    {errors.client}
+                                                                </FormHelperText>
+                                                            )}
+                                                        </FormControl>
+                                                    </Grid>
+                                                    <Grid item xs={12} sm={6} sx={{ width: '100%' }}>
+                                                        <FormControl sx={{ width: '100%', mb: 1, mt: 1 }}>
+                                                            <InputLabel>Document Type</InputLabel>
+                                                            <Select
+                                                                value={docType}
+                                                                label="Document Type"
+                                                                onChange={handleChangeDocType}
+                                                                name="docType"
+                                                                error={Boolean(touched.docType && errors.docType)}
+                                                                endAdornment={
+                                                                    <InputAdornment position="end">
+                                                                        <CustomWidthTooltip
+                                                                            TransitionComponent={Fade}
+                                                                            TransitionProps={{ timeout: 600 }}
+                                                                            title={
+                                                                                <Typography>
+                                                                                    This the document type, which can be any of the following:
+                                                                                    <br />
+                                                                                    <ul>
+                                                                                        <li><b>Policy</b>: <i>This identifies Silensec/CYBER RANGES Policies such as the Information Security Policy, the Incident Management Policy, etc.</i></li>
+                                                                                        <li><b>Procedure</b>: <i>This identifies Silensec/CYBER RANGES Procedures, for example: Incident Response Procedure, etc. As well as any other internal document that is not a policy.</i></li>
+                                                                                        <li><b>Template</b>: <i>This identifies a document template to be used for the creation of new documents.</i></li>
+                                                                                        <li><b>Record</b>: <i>This identifies Silensec/CYBER RANGES company records. Examples include backup schedule, log schedule, risk assessment reports, etc.</i></li>
+                                                                                    </ul>
+                                                                                </Typography>
+                                                                            }
+                                                                            placement="right-end"
+                                                                            sx={{ fontSize: 24, maxWidth: '100%', }}>
+                                                                            <IconButton size="small" style={{ marginRight: '10px' }}>
+                                                                                <AnimatedInfoIcon />
+                                                                            </IconButton>
+                                                                        </CustomWidthTooltip>
+                                                                    </InputAdornment>
+                                                                }
+                                                            >
+                                                                <MenuItem value=""><i>Choose the document type...</i></MenuItem>
+                                                                <MenuItem value="POL">Policy</MenuItem>
+                                                                <MenuItem value="PRO">Procedure</MenuItem>
+                                                                <MenuItem value="TPL">Template</MenuItem>
+                                                                <MenuItem value="REC">Record</MenuItem>
+                                                            </Select>
+                                                            {touched.docType && errors.docType && (
+                                                                <FormHelperText error>
+                                                                    {errors.docType}
+                                                                </FormHelperText>
+                                                            )}
+                                                        </FormControl>
+                                                    </Grid>
+                                                    <Grid item xs={12} sm={6}>
+                                                        <FormControl sx={{ width: '100%', mb: 1, mt: 1 }}>
+                                                            <TextField
+                                                                name="docNumber"
+                                                                variant="outlined"
+                                                                label="Document Number"
+                                                                onChange={handleChangeDocNumber}
+                                                                value={docNumber}
+                                                                error={Boolean(touched.docNumber && errors.docNumber)}
+                                                                InputProps={{
+                                                                    endAdornment: (
+                                                                        <InputAdornment position="end">
+                                                                            <CustomWidthTooltip
+                                                                                TransitionComponent={Fade}
+                                                                                TransitionProps={{ timeout: 600 }}
+                                                                                title={
+                                                                                    <Typography>
+                                                                                        This is a unique numerical identifier, identifying the documnet of record. The same numerical idenifier can be used for:
+                                                                                        <ul>
+                                                                                            <li>Documents</li>
+                                                                                            <li>Records</li>
+                                                                                        </ul>
+                                                                                        <i>e.g., SIL-D-001 and SIL-R-001</i>
+                                                                                        <br />
+                                                                                        As such, provide a number/integer in the input field
+                                                                                        <ul>
+                                                                                            <li>1234</li>
+                                                                                            <li>Etc...</li>
+                                                                                        </ul>
+                                                                                    </Typography>
+                                                                                }
+                                                                                placement="right-end"
+                                                                            >
+                                                                                <IconButton size="small">
+                                                                                    <AnimatedInfoIcon />
+                                                                                </IconButton>
+                                                                            </CustomWidthTooltip>
+                                                                        </InputAdornment>
+                                                                    ),
+                                                                }}
+                                                            />
+                                                            {touched.docNumber && errors.docNumber && (
+                                                                <FormHelperText error>
+                                                                    {errors.docNumber}
+                                                                </FormHelperText>
+                                                            )}
+                                                        </FormControl></Grid>
+                                                    <Grid item xs={12} sm={6}>
+                                                        <FormControl sx={{ width: '100%', mb: 1, mt: 1 }}>
+                                                            <TextField
+                                                                name="version"
+                                                                variant="outlined"
+                                                                label="Version"
+                                                                onChange={handleChangeVersion}
+                                                                value={version}
+                                                                error={Boolean(touched.version && errors.version)}
+                                                                InputProps={{
+                                                                    endAdornment: (
+                                                                        <InputAdornment position="end">
+                                                                            <CustomWidthTooltip
+                                                                                TransitionComponent={Fade}
+                                                                                TransitionProps={{ timeout: 600 }}
+                                                                                title={
+                                                                                    <Typography>
+                                                                                        This the <b>version number</b> of the document.
+                                                                                        <br />
+                                                                                        <br />
+                                                                                        For example:
+                                                                                        <ul>
+                                                                                            <li>0.1</li>
+                                                                                            <li>0.2</li>
+                                                                                            <li>Etc...</li>
+                                                                                        </ul>
 
-                                                </FormControl>
-                                                <FormControl sx={{ m: 1, width: '100%' }}>
-                                                    <TextField name="docNumber" variant="outlined" label="Document Number" onChange={handleChangeDocNumber} value={docNumber} error={Boolean(touched.docNumber && errors.docNumber)} />
-                                                </FormControl>
-                                                <FormControl sx={{ m: 1, width: '100%' }}>
-                                                    <TextField name="version" variant="outlined" label="Version" onChange={handleChangeVersion} value={version} error={Boolean(touched.version && errors.version)} />
-                                                </FormControl>
+                                                                                    </Typography>
+                                                                                }
+                                                                                placement="right-end"
+                                                                            >
+                                                                                <IconButton size="small">
+                                                                                    <AnimatedInfoIcon />
+                                                                                </IconButton>
+                                                                            </CustomWidthTooltip>
+                                                                        </InputAdornment>
+                                                                    ),
+                                                                }}
+                                                            />
+                                                            {touched.version && errors.version && (
+                                                                <FormHelperText error>
+                                                                    {errors.version}
+                                                                </FormHelperText>
+                                                            )}
+                                                        </FormControl></Grid>
+                                                </Grid>
                                             </Box>
 
                                         )}
+                                        {(data.use === 'external') &&
+                                            <Button type="submit" disabled={isSubmitting} variant="contained"
+                                                component={motion.button}
+                                                whileHover={{
+                                                    scale: 1.1,
+                                                    transition: { duration: 0.3 }
+                                                }}
+                                                whileTap={{ scale: 0.9 }}
+                                                transition={{ type: "spring", duration: 0.5 }}
+                                            >
+                                                Submit
+                                            </Button>}
+                                        {(data.use === 'internal') &&
+                                            <Button type="submit" disabled={isSubmitting} variant="contained"
+                                                component={motion.button}
 
-                                        {(data.use === 'external') && <Button type="submit" disabled={isSubmitting} variant="contained">
-                                            Submit
-                                        </Button>}
-                                        {(data.use === 'internal') && <Button type="submit" disabled={isSubmitting} variant="contained">
-                                            Submit
-                                        </Button>}
-    </Box>
-  )}
-</Formik>
+                                                whileHover={{
+                                                    scale: 1.1,
+                                                    transition: { duration: 0.3 }
+                                                }}
+                                                whileTap={{ scale: 0.9 }}
+                                                transition={{ type: "spring", duration: 0.5 }}
+                                                
+                                            >
+                                                Submit
+                                            </Button>}
+                                    </Box>
+                                )}
+                            </Formik>
                         </Box>
                     </Modal>
                 </Box>
-
-
             </Box >
-
-
         </Fragment >
     )
 }
