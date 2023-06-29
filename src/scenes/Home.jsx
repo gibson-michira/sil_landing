@@ -22,7 +22,7 @@ import Grid from '@mui/material/Grid';
 import { motion } from "framer-motion";
 import { useTheme } from '@mui/material/styles';
 import { useMediaQuery } from '@mui/material';
-import { InputAdornment, IconButton, Popper } from '@mui/material';
+import { InputAdornment, IconButton } from '@mui/material';
 import InfoIcon from '@mui/icons-material/Info';
 import Tooltip, { tooltipClasses } from '@mui/material/Tooltip';
 import Fade from '@mui/material/Fade';
@@ -199,7 +199,6 @@ const Home = () => {
         },
     });
     useEffect(() => {
-        const boxes = document.querySelectorAll('.animated-box');
         const observer = new IntersectionObserver((entries) => {
             entries.forEach((entry) => {
                 if (entry.isIntersecting) {
@@ -817,7 +816,7 @@ const Home = () => {
                                                                                 TransitionProps={{ timeout: 600 }}
                                                                                 title={
                                                                                     <Typography>
-                                                                                        This is a unique numerical identifier, identifying the documnet of record. The same numerical idenifier can be used for:
+                                                                                        This is a unique numerical identifier, identifying the document of record. The same numerical idenifier can be used for:
                                                                                         <ul>
                                                                                             <li>Documents</li>
                                                                                             <li>Records</li>
